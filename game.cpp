@@ -1,11 +1,14 @@
 #include "game.hpp"
 #include "TextureManager.hpp"
 #include "GameObject.hpp"
+#include "Map.hpp"
+#include "Map.cpp"
 
 GameObject* player = NULL;
 GameObject* enemy = NULL;
+Map* backgroundMap = NULL;
 
-// SDL_Renderer* Game::renderer = NULL;
+SDL_Renderer* Game::renderer = NULL;
 
 Game::Game(){}
 
@@ -38,8 +41,10 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
             SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         }
         // string file = "assets/" + path;
-        player = new GameObject("assets/player.bmp", renderer, 0, 0);
-        enemy = new GameObject("assets/enemy.bmp", renderer, 50, 50);
+        player = new GameObject("assets/player.bmp", 0, 0);
+        enemy = new GameObject("assets/enemy.bmp", 50, 50);
+        backgroundMap = new Map();
+
         if(player == NULL){
             cout << "PLAYER NOT FOUND: " << SDL_GetError() << endl;
         }
@@ -69,10 +74,12 @@ void Game::handleEvents(){
 void Game::update(){
     player->Update();
     enemy->Update();
+    // backgroundMap->LoadMap();
 }
 
 void Game::render(){
     SDL_RenderClear(renderer);    
+    backgroundMap->DrawMap();
     player->Render();
     enemy->Render();
     SDL_RenderPresent(renderer);

@@ -20,7 +20,7 @@ int main(int argc, char* argv[]){
     Uint32 frameStart;
     int frameTime;
     
-    game -> init("Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, false);
+    game -> init("Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 640, false);
 
     while(game -> running()){
 

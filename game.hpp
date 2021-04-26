@@ -21,12 +21,12 @@ class Game{
         void render();
         void clean();
         bool running(){return isRunning;}
-        
-        // static SDL_Renderer* renderer = NULL;
+                
+        static SDL_Renderer* renderer;
 
     private:
         bool isRunning;
-        SDL_Renderer* renderer = NULL;
+        // SDL_Renderer* renderer = NULL;
         SDL_Window* window = NULL;
         // SDL_Texture* playerTex = NULL;
     
