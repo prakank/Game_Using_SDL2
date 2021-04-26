@@ -1,17 +1,18 @@
 #include "game.hpp"
 #include "TextureManager.hpp"
-#include "GameObject.hpp"
+
 #include "Map.cpp"
 #include "ECS/Components.hpp"
 
-GameObject* player = NULL;
-GameObject* enemy = NULL;
+// GameObject* player = NULL;
+// GameObject* enemy = NULL;
+
 Map* backgroundMap = NULL;
 
 SDL_Renderer* Game::renderer = NULL;
 
 Manager manager;
-auto& newPlayer(manager.addEntity());
+auto& player(manager.addEntity());
 
 Game::Game(){}
 
@@ -43,22 +44,11 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
         else{
             SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         }
-        // string file = "assets/" + path;
-        player = new GameObject("assets/player.bmp", 0, 0);
-        enemy = new GameObject("assets/enemy.bmp", 50, 50);
         backgroundMap = new Map();
 
-        newPlayer.addComponent<PositionComponent>();
-        newPlayer.getComponent<PositionComponent>().setPos(5000, 5000); 
-        // newPlayer.getComponent<PositionComponent>().
+        player.addComponent<PositionComponent>(0,100);
+        player.addComponent<SpriteComponent>("assets/player.png");
 
-        if(player == NULL){
-            cout << "PLAYER NOT FOUND: " << SDL_GetError() << endl;
-        }
-        if(enemy == NULL){
-            cout << "ENEMY NOT FOUND: " << SDL_GetError() << endl;
-        }
-        // playerTex = TextureManager::LoadTexture("assets/tank.bmp", renderer);
         
     }
     isRunning = true;
@@ -79,18 +69,19 @@ void Game::handleEvents(){
 }
 
 void Game::update(){
-    player->Update();
-    enemy->Update();
-    // backgroundMap->LoadMap();
+    
+    manager.refresh();
     manager.update();
-    cout << newPlayer.getComponent<PositionComponent>().x() <<", " << newPlayer.getComponent<PositionComponent>().y() << endl;
+
+    if(player.getComponent<PositionComponent>().x() > 100){
+        player.getComponent<SpriteComponent>().setTex("assets/enemy.png");
+    }
 }
 
 void Game::render(){
     SDL_RenderClear(renderer);    
     backgroundMap->DrawMap();
-    player->Render();
-    enemy->Render();
+    manager.draw();
     SDL_RenderPresent(renderer);
 }
 

@@ -103,12 +103,13 @@ class Entity
 
         template<typename T> bool hasComponent() const
         {
-            return componentBitset[getComponentTypeID<T>()];
+            return componentBitset[getComponentTypeID<T>];
         }
 
         template<typename T, typename... TArgs > T& addComponent(TArgs&&... mArgs)
         {
-            T* c( new T( forward<TArgs>(mArgs)... ) );
+            // T* c( new T( forward<TArgs>(mArgs)... ) );
+            T* c(new T(std::forward<TArgs>(mArgs)...));
             c->entity = this;
             unique_ptr<Component> uPtr{ c };
             components.emplace_back(move(uPtr)); // Will overwrite the pointer if any in the components vector
@@ -125,7 +126,7 @@ class Entity
 
         template<typename T> T& getComponent() const
         {
-            // if(!hasComponent<T>())return nullptr;            
+            // if(!hasComponent<T>())return nullptr;       
             auto ptr(componentArray[getComponentTypeID<T>()]);
             return *static_cast<T*>(ptr);
         }
