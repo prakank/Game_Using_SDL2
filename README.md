@@ -1,1 +1,1 @@
-# Game-using-SDL2-and-C-
+# Game using SDL2 and C++
