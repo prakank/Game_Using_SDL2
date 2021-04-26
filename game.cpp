@@ -1,7 +1,7 @@
 #include "game.hpp"
 #include "TextureManager.hpp"
 #include "GameObject.hpp"
-#include "Map.hpp"
+#include "Map.cpp"
 #include "ECS/Components.hpp"
 
 GameObject* player = NULL;
