@@ -50,7 +50,6 @@ Map::Map(){
 
 Map::~Map(){}
 
-
 void Map::LoadMap(int arr[20][25]){
     
     for(int row=0; row < 20;row++){
@@ -60,7 +59,6 @@ void Map::LoadMap(int arr[20][25]){
     }
 
 }
-
 
 void Map::DrawMap(){
 

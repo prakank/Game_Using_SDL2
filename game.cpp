@@ -2,13 +2,16 @@
 #include "TextureManager.hpp"
 #include "GameObject.hpp"
 #include "Map.hpp"
-#include "Map.cpp"
+#include "ECS/Components.hpp"
 
 GameObject* player = NULL;
 GameObject* enemy = NULL;
 Map* backgroundMap = NULL;
 
 SDL_Renderer* Game::renderer = NULL;
+
+Manager manager;
+auto& newPlayer(manager.addEntity());
 
 Game::Game(){}
 
@@ -45,6 +48,10 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
         enemy = new GameObject("assets/enemy.bmp", 50, 50);
         backgroundMap = new Map();
 
+        newPlayer.addComponent<PositionComponent>();
+        newPlayer.getComponent<PositionComponent>().setPos(5000, 5000); 
+        // newPlayer.getComponent<PositionComponent>().
+
         if(player == NULL){
             cout << "PLAYER NOT FOUND: " << SDL_GetError() << endl;
         }
@@ -75,6 +82,8 @@ void Game::update(){
     player->Update();
     enemy->Update();
     // backgroundMap->LoadMap();
+    manager.update();
+    cout << newPlayer.getComponent<PositionComponent>().x() <<", " << newPlayer.getComponent<PositionComponent>().y() << endl;
 }
 
 void Game::render(){
