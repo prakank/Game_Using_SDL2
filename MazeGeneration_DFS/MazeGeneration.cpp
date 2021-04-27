@@ -149,8 +149,9 @@ void MazeGeneration::GenerateTileMap()
 
 void MazeGeneration::WriteToText()
 {
-    std::string filename = "../assets/Maze.txt";
+    std::string filename = "assets/Maze.txt";
     std::ofstream output(filename);
+    
     for(int i=0; i< Rows; i++){
         for(int j=0;j < Columns; j++){
             output << Visited[i][j];
@@ -166,6 +167,7 @@ void MazeGeneration::MazeGenerator()
     Generate();
     GenerateTileMap();
     WriteToText();
+    // std::cout << "Hey";
 }
 
 // int main(){

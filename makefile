@@ -14,3 +14,4 @@ run:
 
 clean:
 	$(RM) -r $(TARGET)
+	$(RM) -r "assets/Maze.txt"
