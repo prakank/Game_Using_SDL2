@@ -1,12 +1,16 @@
 // #pragma once
 
+// Alternative for #pragma once
+#ifndef GAME_HPP  
+#define GAME_HPP
+
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <bits/stdc++.h>
+#include <vector>
 
-
-#ifndef game_h  // Alternative for #pragma once
-#define game_h
+class ColliderComponent;
 
 using namespace std;
 
@@ -24,12 +28,15 @@ class Game{
                 
         static SDL_Renderer* renderer;
         static SDL_Event event;
+        static std::vector<ColliderComponent*> colliders;
+        static void AddTile(int id, int x, int y);
+        
+
 
     private:
         bool isRunning;
-        // SDL_Renderer* renderer = NULL;
+        int cnt = 0;
         SDL_Window* window = NULL;
-        // SDL_Texture* playerTex = NULL;
     
 };
 

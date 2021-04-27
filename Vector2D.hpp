@@ -34,6 +34,9 @@ class Vector2D
         Vector2D& operator*=(const Vector2D& v);
         Vector2D& operator/=(const Vector2D& v);
 
+        Vector2D& operator*(const int& i);
+        Vector2D& Zero();
+
         // Overloading output stream
         friend std::ostream& operator<<(std::ostream stream, const Vector2D& v); 
 };

@@ -27,8 +27,10 @@ class ColliderComponent : public Component
             {
                 entity->addComponent<TransformComponent>();
             }
-                transform = &entity->getComponent<TransformComponent>();
+            transform = &entity->getComponent<TransformComponent>();
             // Check if same colliderComponent gets multiple calls to init        
+
+            Game::colliders.push_back(this);
         }
 
         void update() override

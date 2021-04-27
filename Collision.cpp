@@ -8,3 +8,24 @@ bool Collision::AABB(const SDL_Rect& a, const SDL_Rect& b)
        b.y + b.h >= a.y )return true;
     return false;
 }
+
+bool Collision::AABB(const ColliderComponent& a, const ColliderComponent& b)
+{
+    if( AABB(a.collider, b.collider ) )
+    {
+        cout << a.tag << " hit: " << b.tag << endl;
+        return true;
+    }
+    return false;
+}
+
+bool Collision::EqualColliderComponent(const ColliderComponent& a, const ColliderComponent& b)
+{
+    if(a.collider.x == b.collider.x &&
+        a.collider.y == b.collider.y &&
+        a.collider.w == b.collider.w &&
+        a.collider.h == b.collider.h &&
+        a.tag == b.tag        
+    )return true;
+    return false;
+}

@@ -1,95 +1,45 @@
 #include "Map.hpp"
 #include "game.hpp"
-#include "TextureManager.hpp"
-
-int lvl1[20][25] = {
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-};
+#include <fstream>
+#include<boost/algorithm/string.hpp>
+#include<boost/format.hpp> 
 
 Map::Map(){
 
-    water = TextureManager::LoadTexture("assets/water.png"); // 0
-    grass = TextureManager::LoadTexture("assets/grass.png"); // 1
-    dirt  = TextureManager::LoadTexture("assets/dirt.png" ); // 2
-    
-    LoadMap(lvl1);
-
-    srcRect = {
-        .x = 0,
-        .y = 0,
-        .w = 32,
-        .h = 32,
-    };
-
-    dstRect = {
-        .x = 0,
-        .y = 0,
-        .w = srcRect.w,
-        .h = srcRect.h,        
-    };
 }
 
 Map::~Map()
 {
-    SDL_DestroyTexture(grass);
-    SDL_DestroyTexture(water);
-    SDL_DestroyTexture(dirt);
 }
 
-void Map::LoadMap(int arr[20][25]){
+void Map::LoadMap(std::string path, int sizeX, int sizeY)
+{
+    int tile;
+    string out;
+    ifstream read(path);
+
+    int MapTileArray[sizeX][sizeY];
+    int t=0;
+    while(getline(read, out))
+    {   
+        vector<string> temp;
+        boost::split(temp, out, boost::is_any_of(","));
+        for(int p=0;p<temp.size();p++)MapTileArray[t][p] = stoi(temp[p]);
+        t++;
+    }
+
+    for(int x = 0; x < sizeX; x++){
+        for(int y = 0; y < sizeY; y++){
+            tile = MapTileArray[x][y];
+            Game::AddTile(tile, x*32, y*32);
     
-    for(int row=0; row < 20;row++){
-        for(int column = 0; column < 25; column++){
-                map[row][column] = arr[row][column];
+            // cout << tile << " ";
+    
         }
+
+        // cout << "\n";
     }
 
-}
+    // mapFile.close();
 
-void Map::DrawMap(){
-
-    int type = 0;
-
-    for(int row=0; row < 20;row++){
-        for(int column = 0; column < 25; column++){
-                
-                type = map[row][column];
-                
-                dstRect.x = column * 32;
-                dstRect.y = row * 32;
-                
-                switch(type){
-                    case 0:
-                        TextureManager::Draw(water, srcRect, dstRect);
-                        break;
-                    case 1:
-                        TextureManager::Draw(grass, srcRect, dstRect);
-                        break;
-                    case 2:
-                        TextureManager::Draw(dirt, srcRect, dstRect);
-                        break;
-                    default:
-                        break;
-                }
-        }
-    }
 }
