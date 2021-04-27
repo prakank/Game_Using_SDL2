@@ -4,6 +4,7 @@
 #include "ECS/Components.hpp"
 #include "Vector2D.hpp"
 #include "Vector2D.cpp"
+#include "Collision.cpp"
 
 // GameObject* player = NULL;
 // GameObject* enemy = NULL;
@@ -15,6 +16,7 @@ SDL_Event Game::event;
 
 Manager manager;
 auto& player(manager.addEntity());
+auto& wall(manager.addEntity());
 
 Game::Game(){}
 
@@ -48,9 +50,14 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
         }
         backgroundMap = new Map();
 
-        player.addComponent<TransformComponent>(0,100);
+        player.addComponent<TransformComponent>(4);
         player.addComponent<SpriteComponent>("assets/player.png");
         player.addComponent<KeyboardController>();
+        player.addComponent<ColliderComponent>("Player");
+
+        wall.addComponent<TransformComponent>(300.0f,300.0f, 300, 20, 1);
+        wall.addComponent<SpriteComponent>("assets/dirt.png");
+        wall.addComponent<ColliderComponent>("wall");
         
     }
     isRunning = true;
@@ -72,10 +79,19 @@ void Game::handleEvents(){
     }
 }
 
+int collision_count = 0;
+
 void Game::update(){
     
     manager.refresh();
     manager.update();
+
+    if( Collision::AABB(player.getComponent<ColliderComponent>().collider, 
+                        wall.getComponent<ColliderComponent>().collider ) )
+    {
+        player.getComponent<TransformComponent>().scale = player.getComponent<TransformComponent>().scale/2;
+        cout << "COLLISION " <<  collision_count++ << "\n";
+    }
 
     // player.getComponent<TransformComponent>().position.Add(Vector2D(2,0));
     
