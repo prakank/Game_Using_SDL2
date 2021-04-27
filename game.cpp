@@ -6,6 +6,7 @@
 #include "Vector2D.cpp"
 #include "Collision.cpp"
 #include "MazeGeneration_DFS/MazeGeneration.cpp"
+#include "ECS/EntityComponentSystem.cpp"
 
 // GameObject* player = NULL;
 // GameObject* enemy = NULL;
@@ -22,6 +23,16 @@ std::vector<ColliderComponent*> Game::colliders;
 Manager manager;
 auto& player(manager.addEntity());
 auto& wall(manager.addEntity());
+
+
+
+enum groupLabels : size_t
+{
+    groupMap,
+    groupPlayers,
+    groupEnemies,
+    groupColliders
+};
 
 auto& tile0(manager.addEntity());
 auto& tile1(manager.addEntity());
@@ -64,13 +75,15 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
         Map::LoadMap("assets/Maze.txt", 20, 25);
 
         player.addComponent<TransformComponent>(4);
-        player.addComponent<SpriteComponent>("assets/player.png");
+        player.addComponent<SpriteComponent>("assets/PlayerAnimatePro.png", true);
         player.addComponent<KeyboardController>();
         player.addComponent<ColliderComponent>("Player");
+        player.addGroup(groupPlayers);
 
         wall.addComponent<TransformComponent>(300.0f,300.0f, 300, 20, 1);
         wall.addComponent<SpriteComponent>("assets/dirt.png");
         wall.addComponent<ColliderComponent>("wall");
+        wall.addGroup(groupMap);
         
     }
     isRunning = true;
@@ -96,24 +109,17 @@ void Game::update(){
     manager.refresh();
     manager.update();
 
-    // for(auto cc: colliders)
-    // {
-    //     // if(*cc == player.getComponent<ColliderComponent>())continue;
-    //     if(!Collision::EqualColliderComponent(player.getComponent<ColliderComponent>(), *cc))
-    //     Collision::AABB(player.getComponent<ColliderComponent>(), *cc);
-    // }
-
-    // if(Collision::AABB(player.getComponent<ColliderComponent>(), 
-    //                 tile0.getComponent<ColliderComponent>()));
-
-    // Collision::AABB(player.getComponent<ColliderComponent>(), 
-    //                 tile1.getComponent<ColliderComponent>());
-    
-    // Collision::AABB(player.getComponent<ColliderComponent>(), 
-    //                 tile2.getComponent<ColliderComponent>());
-
-    // Collision::AABB(player.getComponent<ColliderComponent>(), 
-    //                 wall.getComponent<ColliderComponent>());
+    for(auto cc: colliders)
+    {
+        // if(*cc == player.getComponent<ColliderComponent>())continue;
+        if(!Collision::EqualColliderComponent(player.getComponent<ColliderComponent>(), *cc))
+        if(Collision::AABB(player.getComponent<ColliderComponent>(), *cc))
+        {
+            player.getComponent<TransformComponent>().velocity * -1;
+            // player.getComponent<TransformComponent>().scale = 1;
+            cout << "COLLISION " <<  collision_count++ << "\n";
+        }
+    }
 
     // if( Collision::AABB(player.getComponent<ColliderComponent>().collider, 
     //                     wall.getComponent<ColliderComponent>().collider ) )
@@ -136,10 +142,28 @@ void Game::update(){
 
 }
 
+
+
+auto& tiles(manager.getGroup(groupMap));
+auto& players(manager.getGroup(groupPlayers));
+auto& enemies(manager.getGroup(groupEnemies));
+
 void Game::render(){
     SDL_RenderClear(renderer);    
     // backgroundMap->DrawMap();
-    manager.draw();
+    // manager.draw();
+    for(auto& t : tiles)
+    {
+        t->draw();
+    }
+    for(auto& p : players)
+    {
+        p->draw();
+    }
+    for(auto& e : enemies)
+    {
+        e->draw();
+    }
     SDL_RenderPresent(renderer);
 }
 
@@ -155,4 +179,6 @@ void Game::AddTile(int id, int x, int y)
 {
     auto& tile(manager.addEntity());
     tile.addComponent<TileComponent>(x, y, 32, 32, id);
+    // tile.addComponent<ColliderComponent>("Tiles");
+    tile.addGroup(groupMap);
 }

@@ -48,7 +48,7 @@ def main(color, TileBackground, Linecolor):
         temp = np.array(temp, np.uint8)
         data = im.fromarray(temp)
         
-        data.save(color + "_" + str(cnt) + ".png");
+        data.save(color + "_" + str(cnt) + ".png")
         cnt = cnt+1
         
 

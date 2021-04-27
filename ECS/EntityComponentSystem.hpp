@@ -15,16 +15,16 @@ class Entity;      // Contains all the components
 class Manager;     // All Entites
 
 using ComponentID = size_t;
-
+using Group = size_t;
 
 // ========================================================================================
-inline ComponentID getComponentTypeID(){
-    static ComponentID lastID = 0;
+inline ComponentID getNewComponentTypeID(){
+    static ComponentID lastID = 0u;
     return lastID++;
 }
 // ========================================================================================
 template <typename T> inline ComponentID getComponentTypeID() noexcept{
-    static ComponentID typeID = getComponentTypeID();
+    static ComponentID typeID = getNewComponentTypeID();
     return typeID;
 }
 // ========================================================================================
@@ -42,11 +42,13 @@ template <typename T> inline ComponentID getComponentTypeID() noexcept{
 
 // Similar to const, difference being that we can use constexpr for any datatype ( including string, functions and classes )
 constexpr size_t maxComponents = 32; 
-
+constexpr size_t maxGroups = 32;
 
 // using bitset library improves the efficiency ( Demerit being, size of array should be know during compile time)
 using ComponentBitset = bitset<maxComponents>;
 using ComponentArray = array<Component*, maxComponents>;
+
+using GroupBitset = bitset<maxGroups>;
 
 class Component
 {
@@ -62,7 +64,7 @@ class Component
 class Entity
 {
     private:
-
+        Manager& manager;
         bool active = true; // To check if current entity is Active or not
 
 // ========================================================================================
@@ -78,9 +80,13 @@ class Entity
 // ========================================================================================
         ComponentArray  componentArray ; 
         ComponentBitset componentBitset;
+        GroupBitset     groupBitset;
     
     public:
         
+        // Constructor
+        Entity(Manager& mManager) : manager(mManager) {}
+
         void update()
         {
             for(auto& c : components) c->update(); // Iterate over all the components linked to this Entity and Update them            
@@ -100,6 +106,18 @@ class Entity
         { 
             active = false; 
         }
+
+        bool hasGroup(Group mGroup)
+        {
+            return groupBitset[mGroup];
+        }
+
+        void addGroup(Group mGroup);
+        void delGroup(Group mGroup)
+        {
+            groupBitset[mGroup] = false;
+        }
+        
 
         template<typename T> bool hasComponent() const
         {
@@ -138,6 +156,7 @@ class Manager
 {
     private:
         vector< unique_ptr<Entity> > entities;
+        array < vector<Entity*>, maxGroups > groupedEntites;
 
     public:
         void update()
@@ -149,7 +168,19 @@ class Manager
             for(auto& e: entities) e->draw();
         }
         void refresh()
-        {
+        {   
+
+            for(unsigned int i = 0; i< maxGroups; i++)
+            {
+                groupedEntites[i].erase( remove_if( begin(groupedEntites[i]), end(groupedEntites[i]),
+                [i](Entity* mEntity)
+                {
+                    return !mEntity->isActive() || !mEntity->hasGroup(i);
+                }),
+                    end(groupedEntites[i])
+                );
+            }
+
             // Removes elements from a sequence using a predicate            
             entities.erase( remove_if( begin(entities), end(entities), 
             [](const unique_ptr<Entity> &mEntity)
@@ -160,9 +191,19 @@ class Manager
             );
         }
 
+        void AddToGroup(Entity* mEntity, Group mGroup)
+        {
+            groupedEntites[mGroup].emplace_back( mEntity);
+        }
+
+        vector<Entity*>& getGroup(Group mGroup)
+        {
+            return groupedEntites[mGroup];
+        } 
+
         Entity& addEntity()
         {
-            Entity* e = new Entity();
+            Entity* e = new Entity(*this);
             unique_ptr<Entity> uPtr{ e };
             entities.emplace_back(std::move(uPtr));
             return *e;

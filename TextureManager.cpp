@@ -10,6 +10,7 @@ SDL_Texture* TextureManager::LoadTexture(const char* fileName){
 
 }
 
-void TextureManager::Draw(SDL_Texture* tex, SDL_Rect src, SDL_Rect dst){
-    SDL_RenderCopy(Game::renderer, tex, &src, &dst);
+void TextureManager::Draw(SDL_Texture* tex, SDL_Rect src, SDL_Rect dst, SDL_RendererFlip flip, int RotateDegrees){
+    SDL_RenderCopyEx(Game::renderer, tex, &src, &dst, RotateDegrees, NULL, flip);
+    
 }

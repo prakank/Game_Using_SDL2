@@ -17,7 +17,7 @@ class TileComponent : public Component
         int tileId;
         char* path = "";
         string temp_path = "";
-        string color = "assets/GenerateTiles/Black";
+        string color = "assets/GenerateTiles/White";
 
         TileComponent() = default;
 

@@ -14,14 +14,14 @@ class TransformComponent : public Component{
 
         int height = 32;
         int width = 32;
-        int scale = 1;
+        float scale = 1;
 
         TransformComponent()
         {
             position.Zero();
         }
 
-        TransformComponent(int s)
+        TransformComponent(float s)
         {
             position.Zero();
             scale = s;
@@ -33,7 +33,7 @@ class TransformComponent : public Component{
             position.y = x;
         }
         
-        TransformComponent(float x, float y, int w, int h, int s)
+        TransformComponent(float x, float y, int w, int h, float s)
         {
             position.x = y;
             position.y = x;
