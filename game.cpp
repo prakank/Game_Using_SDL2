@@ -1,8 +1,9 @@
 #include "game.hpp"
 #include "TextureManager.hpp"
-
 #include "Map.cpp"
 #include "ECS/Components.hpp"
+#include "Vector2D.hpp"
+#include "Vector2D.cpp"
 
 // GameObject* player = NULL;
 // GameObject* enemy = NULL;
@@ -10,6 +11,7 @@
 Map* backgroundMap = NULL;
 
 SDL_Renderer* Game::renderer = NULL;
+SDL_Event Game::event;
 
 Manager manager;
 auto& player(manager.addEntity());
@@ -46,9 +48,9 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
         }
         backgroundMap = new Map();
 
-        player.addComponent<PositionComponent>(0,100);
+        player.addComponent<TransformComponent>(0,100);
         player.addComponent<SpriteComponent>("assets/player.png");
-
+        player.addComponent<KeyboardController>();
         
     }
     isRunning = true;
@@ -56,9 +58,11 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 }
 
 void Game::handleEvents(){
-    SDL_Event e;
-    SDL_PollEvent(&e);
-    switch(e.type){
+
+    
+    
+    SDL_PollEvent(&event);
+    switch(event.type){
         case SDL_QUIT:
             isRunning = false;
             break;
@@ -73,9 +77,16 @@ void Game::update(){
     manager.refresh();
     manager.update();
 
-    if(player.getComponent<PositionComponent>().x() > 100){
-        player.getComponent<SpriteComponent>().setTex("assets/enemy.png");
-    }
+    // player.getComponent<TransformComponent>().position.Add(Vector2D(2,0));
+    
+    // if(player.getComponent<TransformComponent>().position.x > 100){
+    //     player.getComponent<SpriteComponent>().setTex("assets/enemy.png");
+    // }
+    
+    // if(player.getComponent<TransformComponent>().position.x > 200){
+    //     player.getComponent<SpriteComponent>().setTex("assets/player.png");
+    // }
+
 }
 
 void Game::render(){

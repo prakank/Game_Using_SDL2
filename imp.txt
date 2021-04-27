@@ -18,3 +18,5 @@ std::end
         addComponent(TArgs&&... mArgs)
 
 std::forward
+
+lvalue and rvalue

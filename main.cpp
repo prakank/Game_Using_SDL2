@@ -4,6 +4,8 @@
 #include "game.cpp"
 #include "GameObject.cpp"
 #include "TextureManager.cpp"
+#include "ECS/Components.hpp"
+#include "Vector2D.hpp"
 
 using namespace std;
 

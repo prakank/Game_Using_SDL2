@@ -7,7 +7,7 @@
 class SpriteComponent : public Component
 {
     private:
-        PositionComponent *position;
+        TransformComponent *transform;
         SDL_Texture* texture = NULL;
         SDL_Rect srcRect, dstRect;
 
@@ -25,20 +25,20 @@ class SpriteComponent : public Component
 
         void init() override
         {
-            position = &entity->getComponent<PositionComponent>();
+            transform = &entity->getComponent<TransformComponent>();
 
             srcRect.x = srcRect.y = 0;
             srcRect.w = srcRect.h = 32;
 
             dstRect.w = dstRect.h = 64;
 
-            // cout << position->x() << " " << position->y() << endl;
+            // cout << transform->x() << " " << transform->y() << endl;
         }
 
         void update() override
         {
-            dstRect.x = position->x();
-            dstRect.y = position->y();
+            dstRect.x = (int)transform->position.x;
+            dstRect.y = (int)transform->position.y;
 
             // cout << dstRect.x << "  " << dstRect.y << endl;
         }

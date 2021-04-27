@@ -2,7 +2,8 @@
 #define COMPONENT_HPP
 
 #include "EntityComponentSystem.hpp"
-#include "PositionComponents.hpp"
+#include "TransformComponent.hpp"
 #include "SpriteComponent.hpp"
+#include "KeyboardController.hpp"
 
 #endif
