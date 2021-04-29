@@ -7,26 +7,16 @@
 #include "Collision.cpp"
 #include "MazeGeneration_DFS/MazeGeneration.cpp"
 #include "ECS/EntityComponentSystem.cpp"
-#include "Constants.hpp"
 
 // GameObject* player = NULL;
 // GameObject* enemy = NULL;
 
-// Map* backgroundMap = NULL;   
-
+// Map* backgroundMap = NULL;
 
 MazeGeneration* MazeGenerator;
 
 SDL_Renderer* Game::renderer = NULL;
 SDL_Event Game::event;
-
-SDL_Rect Game::camera = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
-
-bool Game::isRunning = false;
-int Game::RowsToSkip = ROWS_TO_SKIP;
-string Game::Color = BACKGROUND_COLOR;
-int mapScale    = OVERALL_SCALE;
-int windowScale = WINDOW_SCALE;
 
 std::vector<ColliderComponent*> Game::colliders;
 
@@ -44,9 +34,9 @@ enum groupLabels : size_t
     groupColliders
 };
 
-auto& tiles(manager.getGroup(groupMap));
-auto& players(manager.getGroup(groupPlayers));
-auto& enemies(manager.getGroup(groupEnemies));
+auto& tile0(manager.addEntity());
+auto& tile1(manager.addEntity());
+auto& tile2(manager.addEntity());
 
 Game::Game(){}
 
@@ -59,20 +49,20 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 
     if( SDL_Init(SDL_INIT_EVERYTHING) < 0){
         printf( "SDL could not initialize! SDL Error: %s\n", SDL_GetError() );
-        Game::isRunning = false;
+        isRunning = false;
         return;
     }
     else{
         window = SDL_CreateWindow(title, xpos, ypos, width, height, flag);
         if( window == NULL){
             printf( "Window could not be created! SDL Error: %s\n", SDL_GetError() );
-            Game::isRunning = false;
+            isRunning = false;
             return;
         }
         renderer = SDL_CreateRenderer(window, -1, 0);
         if(renderer == NULL){
             printf( "Renderer could not be created! SDL Error: %s\n", SDL_GetError() );
-            Game::isRunning = false;  
+            isRunning = false;  
             return;
         }
         else{
@@ -82,17 +72,21 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
         MazeGenerator = new MazeGeneration();
         MazeGenerator -> MazeGenerator();
 
-        Map::LoadMap("assets/Maze.txt", MAZE_ROWS, MAZE_COLUMNS);
+        Map::LoadMap("assets/Maze.txt", 20, 25);
 
-        player.addComponent<TransformComponent>(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, DEFAULT_IMAGE_SIZE,
-                                                 DEFAULT_IMAGE_SIZE, mapScale);
-        player.addComponent<SpriteComponent>("assets/player.png", ANIMATION);
+        player.addComponent<TransformComponent>(4);
+        player.addComponent<SpriteComponent>("assets/PlayerAnimatePro.png", true);
         player.addComponent<KeyboardController>();
         player.addComponent<ColliderComponent>("Player");
         player.addGroup(groupPlayers);
+
+        wall.addComponent<TransformComponent>(300.0f,300.0f, 300, 20, 1);
+        wall.addComponent<SpriteComponent>("assets/dirt.png");
+        wall.addComponent<ColliderComponent>("wall");
+        wall.addGroup(groupMap);
         
     }
-    Game::isRunning = true;
+    isRunning = true;
     return;
 }
 
@@ -100,7 +94,7 @@ void Game::handleEvents(){
     SDL_PollEvent(&event);
     switch(event.type){
         case SDL_QUIT:
-            Game::isRunning = false;
+            isRunning = false;
             break;
 
         default:
@@ -115,34 +109,17 @@ void Game::update(){
     manager.refresh();
     manager.update();
 
-    camera.x = player.getComponent<TransformComponent>().position.x - SCREEN_WIDTH/2;
-    camera.y = player.getComponent<TransformComponent>().position.y - SCREEN_HEIGHT/2;
-
-    camera.x = max(camera.x,0);
-    camera.y = max(camera.y,0);
-    camera.x = min(camera.x, camera.w * ( mapScale / windowScale - 1 ) );
-    camera.y = min(camera.y, camera.h * ( mapScale / windowScale - 1 ) );
-
-    // Vector2D pVel = player.getComponent<TransformComponent>().velocity;
-    // int pSpeed    = player.getComponent<TransformComponent>().speed;  
-
-    // for(auto t: tiles)
-    // {
-    //     t->getComponent<TileComponent>().tileRect.x += -(pVel.x * pSpeed);
-    //     t->getComponent<TileComponent>().tileRect.y += -(pVel.y * pSpeed);
-    // }
-
-    // for(auto cc: colliders)
-    // {
-    //     // if(*cc == player.getComponent<ColliderComponent>())continue;
-    //     if(!Collision::EqualColliderComponent(player.getComponent<ColliderComponent>(), *cc))
-    //     if(Collision::AABB(player.getComponent<ColliderComponent>(), *cc))
-    //     {
-    //         player.getComponent<TransformComponent>().velocity * -1;
-    //         // player.getComponent<TransformComponent>().scale = 1;
-    //         cout << "COLLISION " <<  collision_count++ << "\n";
-    //     }
-    // }
+    for(auto cc: colliders)
+    {
+        // if(*cc == player.getComponent<ColliderComponent>())continue;
+        if(!Collision::EqualColliderComponent(player.getComponent<ColliderComponent>(), *cc))
+        if(Collision::AABB(player.getComponent<ColliderComponent>(), *cc))
+        {
+            player.getComponent<TransformComponent>().velocity * -1;
+            // player.getComponent<TransformComponent>().scale = 1;
+            cout << "COLLISION " <<  collision_count++ << "\n";
+        }
+    }
 
     // if( Collision::AABB(player.getComponent<ColliderComponent>().collider, 
     //                     wall.getComponent<ColliderComponent>().collider ) )
@@ -167,6 +144,9 @@ void Game::update(){
 
 
 
+auto& tiles(manager.getGroup(groupMap));
+auto& players(manager.getGroup(groupPlayers));
+auto& enemies(manager.getGroup(groupEnemies));
 
 void Game::render(){
     SDL_RenderClear(renderer);    
@@ -198,8 +178,7 @@ void Game::clean(){
 void Game::AddTile(int id, int x, int y)
 {
     auto& tile(manager.addEntity());
-    tile.addComponent<TileComponent>(x, y, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, id, mapScale);
+    tile.addComponent<TileComponent>(x, y, 32, 32, id);
     // tile.addComponent<ColliderComponent>("Tiles");
     tile.addGroup(groupMap);
-    // cout << id << "\n";
 }

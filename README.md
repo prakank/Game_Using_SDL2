@@ -1,1 +1,1 @@
-# 2-Player-Maze-Game
+# Game using SDL2 and C++

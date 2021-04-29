@@ -5,8 +5,6 @@
 #include <vector>
 #include <stack>
 #include <string>
-#include "../Constants.hpp"
-
 #define pii std::pair<int,int>
 #define mp std::make_pair
 #define pb push_back
@@ -17,8 +15,8 @@ class MazeGeneration{
 
     public:
         // 20*25 Current dimensions
-        static const int Rows    =    MAZE_ROWS;
-        static const int Columns = MAZE_COLUMNS;
+        static const int Rows = 20;
+        static const int Columns = 25;
         int Visited[Rows][Columns];
         // Will use Visited array to store the TileMap
         
@@ -32,7 +30,6 @@ class MazeGeneration{
         std::stack< pii > cells;
 
         MazeGeneration(); // Initialize Visited to 0
-        
         void Generate();
         void PushIntoArray(pii x, pii y);
         void GenerateTileMap();

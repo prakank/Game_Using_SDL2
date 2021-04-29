@@ -31,13 +31,10 @@ class Game{
         static std::vector<ColliderComponent*> colliders;
         static void AddTile(int id, int x, int y);
         
-        static SDL_Rect camera;
-        static bool isRunning;
-        static int RowsToSkip;
-        static string Color;
+
 
     private:
-        
+        bool isRunning;
         int cnt = 0;
         SDL_Window* window = NULL;
     
