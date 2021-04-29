@@ -3,6 +3,9 @@
 
 #include "Components.hpp"
 #include "../Vector2D.hpp"
+#include "../game.hpp"
+#include "../Constants.hpp"
+// #include "SpriteComponent.hpp"
 
 class TransformComponent : public Component{
 
@@ -10,11 +13,14 @@ class TransformComponent : public Component{
 
         Vector2D position;
         Vector2D velocity;
-        int speed = 5;
+        int speed = PLAYER_SPEED;
 
         int height = 32;
-        int width = 32;
+        int width  = 32; 
         float scale = 1;
+
+        int dstWidth;
+        int dstHeight;
 
         TransformComponent()
         {
@@ -23,7 +29,8 @@ class TransformComponent : public Component{
 
         TransformComponent(float s)
         {
-            position.Zero();
+            position.x = SCREEN_WIDTH/2; // Starting with centre of the screen
+            position.y = SCREEN_HEIGHT/2;
             scale = s;
         }
 
@@ -35,8 +42,8 @@ class TransformComponent : public Component{
         
         TransformComponent(float x, float y, int w, int h, float s)
         {
-            position.x = y;
-            position.y = x;
+            position.x = x;
+            position.y = y;
             width = w;
             height = h;
             scale = s;
@@ -45,12 +52,22 @@ class TransformComponent : public Component{
         void init() override
         {
             velocity.Zero();
+            dstWidth = (width - ROWS_TO_SKIP) * scale;
+            dstHeight = (height - ROWS_TO_SKIP) * scale;
         }
 
         void update() override
         {   
             position.x += velocity.x * speed;
             position.y += velocity.y * speed;
+
+            position.x = max(position.x,(ROWS_TO_SKIP/2) * scale);
+            position.y = max(position.y,(ROWS_TO_SKIP/2) * scale);
+
+            // player_dstRect = entity->getComponent<SpriteComponent>().dstRect;
+
+            position.x = min(position.x, static_cast<float>(Game::camera.x + Game::camera.w - dstWidth  - (ROWS_TO_SKIP/2) * scale ) );
+            position.y = min(position.y, static_cast<float>(Game::camera.y + Game::camera.h - dstHeight - (ROWS_TO_SKIP/2) * scale ) );
         }
 
 };

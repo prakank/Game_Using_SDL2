@@ -5,62 +5,55 @@
 #include "TransformComponent.hpp"
 #include "../TextureManager.hpp"
 #include <SDL2/SDL.h>
-
+#include "../game.hpp"
 
 class TileComponent : public Component 
 {
     public:
-        TransformComponent *transform;
-        SpriteComponent *sprite;
-        SDL_Rect tileRect;
+
+        SDL_Rect tileRect;  // Acts as the dst Rect
         SDL_Texture *texture;
+        Vector2D position;
+
         int tileId;
-        char* path = "";
+        
         string temp_path = "";
-        string color = "assets/GenerateTiles/White";
+        string color = "assets/GenerateTiles/" + Game::Color;
 
         TileComponent() = default;
 
-        TileComponent(int x, int y, int w, int h, int id)
+        TileComponent(int x, int y, int w, int h, int id, int scaleBackground)
         {
             tileRect = {
-                .x = x,
-                .y = y,
-                .w = w,
-                .h = h,
+                .x = y*scaleBackground,
+                .y = x*scaleBackground,
+                .w = w*scaleBackground,
+                .h = h*scaleBackground,
             };
+
+//             if(x == 0 && y == 0)
+//             {
+//                 cout << w << " " << h << " " <<  scaleBackground << endl;
+//             }
+            
             tileId = id;
+            position.x = tileRect.x;
+            position.y = tileRect.y;
 
             temp_path = color + "_" + to_string(id) + ".png";
-            // cout << temp_path << endl;
-            // strcpy(path, temp_path.c_str());
-            // path = temp_path;
-
-            // switch(tileId)
-            // {
-            //     case 0:
-            //         path = "assets/water.png";
-            //         break;
-            //     case 1:
-            //         path = "assets/dirt.png";
-            //         break;
-            //     case 2:
-            //         path = "assets/grass.png";
-            //         break;
-            //     default:
-            //         break;                
-            // }
-
+            texture = TextureManager::LoadTexture(temp_path.c_str());
         }
 
-        void init() override
+
+        void update() override
+        {
+            tileRect.x = position.x - Game::camera.x;
+            tileRect.y = position.y - Game::camera.y;
+        }
+
+        void draw() override
         {   
-            entity->addComponent<TransformComponent>((float)tileRect.x, (float)tileRect.y, tileRect.w, tileRect.h, 1);
-            transform = &entity->getComponent<TransformComponent>();
-
-            entity->addComponent<SpriteComponent>(temp_path.c_str());
-            sprite = &entity->getComponent<SpriteComponent>();
-
+            TextureManager::Draw(texture, tileRect);
         }
 
 
